@@ -5,33 +5,33 @@ import org.jboss.logging.Logger
 import javax.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
+@Suppress("unused")
 class HealthCheck(private val registry: Registry) {
 
     @Scheduled(every = "10s")
     fun checkModels() {
         registry.clients.forEach { (version, client) ->
-            // TODO Execute health check
+            log.debug("Check health for $version")
             client.get("/q/health")
                 .send()
                 .onFailure().invoke { throwable ->
-                    unregister(version, "status code ${throwable.message}")
+                    unregisterOnFailure(version, throwable.message ?: "n/a")
                 }
                 .subscribe().with { response ->
-                    if (response.statusCode() == 200) {
-                        LOGGER.info("Health check for model service $version successful")
-                    } else {
-                        unregister(version, "status code ${response.statusCode()}")
+                    log.debug("Health check for $version returned ${response.statusCode()}")
+                    if (response.statusCode() != 200) {
+                        unregisterOnFailure(version, "status code ${response.statusCode()}")
                     }
                 }
         }
     }
 
-    fun unregister(version: Version, reason: String) {
-        LOGGER.error("Health check for model service $version failed: $reason")
+    private fun unregisterOnFailure(version: Version, reason: String) {
+        log.error("Health check for model service $version failed: $reason")
         registry.unregister(version)
     }
 
     companion object {
-        private val LOGGER = Logger.getLogger(HealthCheck::class.java)
+        private val log = Logger.getLogger(HealthCheck::class.java)
     }
 }

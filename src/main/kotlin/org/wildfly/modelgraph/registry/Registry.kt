@@ -64,23 +64,28 @@ class Registry(private val vertx: Vertx, private val redis: ReactiveRedisClient)
         get() = _clients
 
     fun onStart(@Observes event: StartupEvent) {
+        log.debug("Execute KEYS $VERSION_KEY:*")
         redis
             .keys("$VERSION_KEY:*")
+            .invoke { response -> log.debug("Keys: ${response.toList().joinToString()}") }
             .onItem().transformToMulti { response -> Multi.createFrom().iterable(response) }
             .onItem().transform { response -> response.toString() }
             .onItem().transformToUniAndMerge { version ->
+                log.debug("Execute HGETALL for $version")
                 redis.hgetall(version).onItem().transform { response ->
+                    log.debug("Data: ${response.toList().joinToString()}")
                     version to response.toList().map { it.toString() }
                 }
             }
             .subscribe().with { versionWithValues ->
                 try {
+                    log.debug("Try to use $versionWithValues for registration")
                     val version = Version.parse(versionWithValues.first.substringAfter("$VERSION_KEY:"))
                     val service = URI(versionWithValues.second[0])
                     val browser = URI(versionWithValues.second[1])
                     register(version, service, browser)
                 } catch (e: Exception) {
-                    LOGGER.error(
+                    log.error(
                         "Unable to register model service ${versionWithValues.first} loaded from redis: ${e.message}"
                     )
                 }
@@ -88,6 +93,7 @@ class Registry(private val vertx: Vertx, private val redis: ReactiveRedisClient)
     }
 
     fun register(version: Version, service: URI, browser: URI) {
+        log.debug("register($version, $service, $browser)")
         try {
             _services[version] = service
             _browsers[version] = browser
@@ -96,7 +102,10 @@ class Registry(private val vertx: Vertx, private val redis: ReactiveRedisClient)
                 defaultPort = service.port
                 userAgent = "mgt-api"
             }
+            log.debug("Create web client for version $version and $service")
             _clients[version] = WebClient.create(vertx, options)
+            log.debug("Web client successfully created")
+            log.debug("Execute HSET ${versionKey(version)} $service $browser")
             redis.hset(
                 listOf(
                     versionKey(version),
@@ -104,22 +113,25 @@ class Registry(private val vertx: Vertx, private val redis: ReactiveRedisClient)
                     browser.toString()
                 )
             ).subscribe().with {
-                LOGGER.info("Registered model service $version")
+                log.info("Registered model service $version")
             }
         } catch (e: Exception) {
-            LOGGER.error("Unable to register model service $version: ${e.message}")
+            log.error("Unable to register model service $version: ${e.message}")
         }
     }
 
     fun unregister(version: Version) {
+        log.debug("unregister($version)")
         try {
             _services.remove(version)
+            _browsers.remove(version)
             _clients.remove(version)?.close()
+            log.debug("Execute DEL ${versionKey(version)}")
             redis.del(listOf(versionKey(version))).subscribe().with {
-                LOGGER.info("Unregistered model service $version")
+                log.info("Unregistered model service $version")
             }
         } catch (e: Exception) {
-            LOGGER.error("Unable to unregister model service $version: ${e.message}")
+            log.error("Unable to unregister model service $version: ${e.message}")
         }
     }
 
@@ -129,6 +141,6 @@ class Registry(private val vertx: Vertx, private val redis: ReactiveRedisClient)
 
     companion object {
         private const val VERSION_KEY = "mgt:version"
-        private val LOGGER = Logger.getLogger(Registry::class.java)
+        private val log = Logger.getLogger(Registry::class.java)
     }
 }

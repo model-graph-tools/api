@@ -10,11 +10,11 @@ import javax.ws.rs.QueryParam
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 
-@Path("/management-model")
+@Path("/operations")
 @Produces(MediaType.APPLICATION_JSON)
-class ManagementModelResource(override val registry: Registry) : ModelResource {
+class OperationResource(override val registry: Registry) : ModelResource {
 
-    override val endpoint: String = "/management-model"
+    override val endpoint: String = "/operations"
 
     @GET
     @Path("/query/{version}")
@@ -33,12 +33,4 @@ class ManagementModelResource(override val registry: Registry) : ModelResource {
     ): Uni<Response> = forward("/deprecated", version) {
         addQueryParam("since", since)
     }
-
-    @GET
-    @Path("/versions/{version}")
-    fun versions(@PathParam("version") version: String): Uni<Response> = forward("/versions", version)
-
-    @GET
-    @Path("/version/{version}")
-    fun version(@PathParam("version") version: String): Uni<Response> = forward("/version", version)
 }

@@ -1,6 +1,5 @@
 package org.wildfly.modelgraph.registry
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import java.net.URI
 import javax.ws.rs.Consumes
 import javax.ws.rs.DELETE
