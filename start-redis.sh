@@ -8,4 +8,4 @@ docker run \
   --memory-swappiness=0 \
   --name mgt-redis \
   --publish 6379:6379 \
-  redis
+  modelgraphtools/redis

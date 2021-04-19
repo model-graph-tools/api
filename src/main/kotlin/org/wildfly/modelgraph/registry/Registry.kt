@@ -140,7 +140,8 @@ class Registry(private val vertx: Vertx, private val redis: ReactiveRedisClient)
     private fun versionKey(version: Version) = "$VERSION_KEY:$version"
 
     companion object {
-        private const val VERSION_KEY = "mgt:version"
+        private const val MGT_PREFIX = "mgt"
+        private const val VERSION_KEY = "$MGT_PREFIX:version"
         private val log = Logger.getLogger(Registry::class.java)
     }
 }
