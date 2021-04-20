@@ -29,7 +29,7 @@ data class Registration(
     internal fun serialize(): String =
         "$productName|$productVersion|$managementVersion|$modelServiceUri|$neo4jBrowserUri"
 
-    override fun toString(): String = "$identifier, model service $modelServiceUri, neo4j $neo4jBrowserUri"
+    override fun toString(): String = "$identifier, model service $modelServiceUri, neo4j browser $neo4jBrowserUri"
 
     companion object {
         internal fun deserialize(identifier: String, data: String): Registration {
