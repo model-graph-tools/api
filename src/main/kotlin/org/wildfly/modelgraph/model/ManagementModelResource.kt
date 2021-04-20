@@ -17,28 +17,20 @@ class ManagementModelResource(override val registry: Registry) : ModelResource {
     override val endpoint: String = "/management-model"
 
     @GET
-    @Path("/query/{version}")
+    @Path("/query/{identifier}")
     fun query(
-        @PathParam("version") version: String,
+        @PathParam("identifier") identifier: String,
         @QueryParam("name") name: String
-    ): Uni<Response> = forward("/query", version) {
+    ): Uni<Response> = forward("/query", identifier) {
         addQueryParam("name", name)
     }
 
     @GET
-    @Path("/deprecated/{version}")
+    @Path("/deprecated/{identifier}")
     fun deprecated(
-        @PathParam("version") version: String,
+        @PathParam("identifier") identifier: String,
         @QueryParam("since") since: String
-    ): Uni<Response> = forward("/deprecated", version) {
+    ): Uni<Response> = forward("/deprecated", identifier) {
         addQueryParam("since", since)
     }
-
-    @GET
-    @Path("/versions/{version}")
-    fun versions(@PathParam("version") version: String): Uni<Response> = forward("/versions", version)
-
-    @GET
-    @Path("/version/{version}")
-    fun version(@PathParam("version") version: String): Uni<Response> = forward("/version", version)
 }

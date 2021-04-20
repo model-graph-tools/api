@@ -1,8 +1,8 @@
 package org.wildfly.modelgraph.registry
 
-import java.net.URI
 import javax.ws.rs.Consumes
 import javax.ws.rs.DELETE
+import javax.ws.rs.GET
 import javax.ws.rs.POST
 import javax.ws.rs.Path
 import javax.ws.rs.PathParam
@@ -19,23 +19,22 @@ import javax.ws.rs.core.Response.Status.NO_CONTENT
 class RegistryResource(val registry: Registry) {
 
     @POST
-    fun register(service: Registration): Response = try {
-        val version = Version.parse(service.version ?: "")
-        val serviceUri = URI(service.service ?: "")
-        val browserUri = URI(service.browser ?: "")
-        registry.register(version, serviceUri, browserUri)
+    fun register(registration: Registration): Response = try {
+        registry.register(registration)
         Response.status(CREATED).build()
     } catch (throwable: Throwable) {
         Response.status(BAD_REQUEST.statusCode, throwable.message).build()
     }
 
     @DELETE
-    @Path("/{version}")
-    fun unregister(@PathParam("version") versionString: String): Response = try {
-        val version = Version.parse(versionString)
-        registry.unregister(version)
+    @Path("/{identifier}")
+    fun unregister(@PathParam("identifier") identifier: String): Response = try {
+        registry.unregister(identifier)
         Response.status(NO_CONTENT).build()
     } catch (throwable: Throwable) {
         Response.status(BAD_REQUEST.statusCode, throwable.message).build()
     }
+
+    @GET
+    fun list(): List<Registration> = registry.registrations.values.toList()
 }

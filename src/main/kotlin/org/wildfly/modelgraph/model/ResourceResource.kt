@@ -18,30 +18,30 @@ class ResourceResource(override val registry: Registry) : ModelResource {
     override val endpoint: String = "/resources"
 
     @GET
-    @Path("/query/{version}")
+    @Path("/query/{identifier}")
     fun query(
-        @PathParam("version") version: String,
+        @PathParam("identifier") identifier: String,
         @QueryParam("name") name: String
-    ): Uni<Response> = forward("/query", version) {
+    ): Uni<Response> = forward("/query", identifier) {
         addQueryParam("name", name)
     }
 
     @GET
-    @Path("/deprecated/{version}")
+    @Path("/deprecated/{identifier}")
     fun deprecated(
-        @PathParam("version") version: String,
+        @PathParam("identifier") identifier: String,
         @QueryParam("since") since: String
-    ): Uni<Response> = forward("/deprecated", version) {
+    ): Uni<Response> = forward("/deprecated", identifier) {
         addQueryParam("since", since)
     }
 
     @GET
-    @Path("/resource/{version}")
+    @Path("/resource/{identifier}")
     fun resource(
-        @PathParam("version") version: String,
+        @PathParam("identifier") identifier: String,
         @QueryParam("address") address: String,
         @QueryParam("skip") @DefaultValue("") skip: String = ""
-    ): Uni<Response> = forward("/resource", version) {
+    ): Uni<Response> = forward("/resource", identifier) {
         addQueryParam("address", address).apply {
             if (skip.isNotEmpty()) {
                 addQueryParam("skip", skip)
@@ -50,20 +50,20 @@ class ResourceResource(override val registry: Registry) : ModelResource {
     }
 
     @GET
-    @Path("/subtree/{version}")
+    @Path("/subtree/{identifier}")
     fun subtree(
-        @PathParam("version") version: String,
+        @PathParam("identifier") identifier: String,
         @QueryParam("address") address: String
-    ): Uni<Response> = forward("/subtree", version) {
+    ): Uni<Response> = forward("/subtree", identifier) {
         addQueryParam("address", address)
     }
 
     @GET
-    @Path("/children/{version}")
+    @Path("/children/{identifier}")
     fun children(
-        @PathParam("version") version: String,
+        @PathParam("identifier") identifier: String,
         @QueryParam("address") address: String
-    ): Uni<Response> = forward("/children", version) {
+    ): Uni<Response> = forward("/children", identifier) {
         addQueryParam("address", address)
     }
 }

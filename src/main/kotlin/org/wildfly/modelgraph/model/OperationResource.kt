@@ -17,20 +17,20 @@ class OperationResource(override val registry: Registry) : ModelResource {
     override val endpoint: String = "/operations"
 
     @GET
-    @Path("/query/{version}")
+    @Path("/query/{identifier}")
     fun query(
-        @PathParam("version") version: String,
+        @PathParam("identifier") identifier: String,
         @QueryParam("name") name: String
-    ): Uni<Response> = forward("/query", version) {
+    ): Uni<Response> = forward("/query", identifier) {
         addQueryParam("name", name)
     }
 
     @GET
-    @Path("/deprecated/{version}")
+    @Path("/deprecated/{identifier}")
     fun deprecated(
-        @PathParam("version") version: String,
+        @PathParam("identifier") identifier: String,
         @QueryParam("since") since: String
-    ): Uni<Response> = forward("/deprecated", version) {
+    ): Uni<Response> = forward("/deprecated", identifier) {
         addQueryParam("since", since)
     }
 }

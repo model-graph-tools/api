@@ -1,9 +1,0 @@
-FROM redis
-
-LABEL maintainer="Harald Pehl <hpehl@redhat.com>"
-
-COPY --chown=redis:redis version-mapping.redis /data/
-COPY mgt-redis.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/mgt-redis.sh
-
-ENTRYPOINT ["mgt-redis.sh"]

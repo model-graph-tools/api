@@ -26,9 +26,9 @@ class HealthCheck(private val registry: Registry) {
         }
     }
 
-    private fun unregisterOnFailure(version: Version, reason: String) {
-        log.error("Health check for model service $version failed: $reason")
-        registry.unregister(version)
+    private fun unregisterOnFailure(identifier: String, reason: String) {
+        log.error("Health check for $identifier failed: $reason")
+        registry.unregister(identifier)
     }
 
     companion object {

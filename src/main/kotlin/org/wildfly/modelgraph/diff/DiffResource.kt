@@ -1,7 +1,6 @@
 package org.wildfly.modelgraph.diff
 
 import org.wildfly.modelgraph.registry.Registry
-import org.wildfly.modelgraph.registry.Version
 import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
@@ -20,11 +19,9 @@ class DiffResource(val registry: Registry) {
         @QueryParam("from") from: String,
         @QueryParam("to") to: String
     ): Response = try {
-        val versionFrom = Version.parse(from)
-        val versionTo = Version.parse(to)
         when {
-            versionFrom !in registry -> missingVersion(versionFrom)
-            versionTo !in registry -> missingVersion(versionTo)
+            from !in registry -> missingVersion(from)
+            to !in registry -> missingVersion(to)
             else -> {
                 Response.status(Response.Status.NO_CONTENT).build()
             }
@@ -33,8 +30,8 @@ class DiffResource(val registry: Registry) {
         Response.status(BAD_REQUEST.statusCode, throwable.message).build()
     }
 
-    private fun missingVersion(version: Version) =
+    private fun missingVersion(identifier: String) =
         Response
-            .status(BAD_REQUEST.statusCode, "No management model service for $version available.")
+            .status(BAD_REQUEST.statusCode, "No model service for $identifier available.")
             .build()
 }

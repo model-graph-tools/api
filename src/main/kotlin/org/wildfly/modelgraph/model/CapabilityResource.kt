@@ -17,11 +17,11 @@ class CapabilityResource(override val registry: Registry) : ModelResource {
     override val endpoint: String = "/capabilities"
 
     @GET
-    @Path("/query/{version}")
+    @Path("/query/{identifier}")
     fun query(
-        @PathParam("version") version: String,
+        @PathParam("identifier") identifier: String,
         @QueryParam("name") name: String
-    ): Uni<Response> = forward("/query", version) {
+    ): Uni<Response> = forward("/query", identifier) {
         addQueryParam("name", name)
     }
 }
