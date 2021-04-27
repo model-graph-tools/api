@@ -2,7 +2,7 @@
 
 The API is a microservice which performs several tasks:
 
-- Registry for the [model](https://github.com/model-graph-tools/model) services
+- Registry for the [model](https://github.com/model-graph-tools/model) services (backed by a redis database)
 - Single point of contact and proxy for the [browser](https://github.com/model-graph-tools/browser)
 - Compute differences of a resource between two versions of the management model
 
