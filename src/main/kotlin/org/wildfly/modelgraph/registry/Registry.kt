@@ -24,10 +24,13 @@ data class Registration(
     @field:JsonProperty("modelServiceUri")
     val modelServiceUri: String = "",
     @field:JsonProperty("neo4jBrowserUri")
-    val neo4jBrowserUri: String = ""
+    val neo4jBrowserUri: String = "",
+    @field:JsonProperty("neo4jBoltUri")
+    val neo4jBoltUri: String = ""
 ) {
+
     internal fun serialize(): String =
-        "$productName|$productVersion|$managementVersion|$modelServiceUri|$neo4jBrowserUri"
+        "$productName|$productVersion|$managementVersion|$modelServiceUri|$neo4jBrowserUri|$neo4jBoltUri"
 
     override fun toString(): String = "$identifier, model service $modelServiceUri, neo4j browser $neo4jBrowserUri"
 
@@ -41,7 +44,8 @@ data class Registration(
                 productVersion = list[1],
                 managementVersion = list[2],
                 modelServiceUri = list[3],
-                neo4jBrowserUri = list[4]
+                neo4jBrowserUri = list[4],
+                neo4jBoltUri = list[5]
             )
         }
     }
