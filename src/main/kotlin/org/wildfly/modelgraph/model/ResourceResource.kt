@@ -30,7 +30,7 @@ class ResourceResource(override val registry: Registry) : ModelResource {
     @Path("/deprecated/{identifier}")
     fun deprecated(
         @PathParam("identifier") identifier: String,
-        @QueryParam("since") since: String
+        @QueryParam("since") @DefaultValue("") since: String = ""
     ): Uni<Response> = forward("/deprecated", identifier) {
         addQueryParam("since", since)
     }
