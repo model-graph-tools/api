@@ -37,7 +37,7 @@ data class Registration(
     companion object {
         internal fun deserialize(identifier: String, data: String): Registration {
             val list = data.split("|")
-            require(list.size == 5) { "Unable to parse registration: Malformed data!" }
+            require(list.size == 6) { "Unable to parse registration: Malformed data!" }
             return Registration(
                 identifier = identifier,
                 productName = list[0],
@@ -122,7 +122,7 @@ class Registry(private val vertx: Vertx, private val redis: ReactiveRedisClient)
         }
     }
 
-    operator fun contains(identifier: String) = identifier in _registrations
+    operator fun contains(identifier: String) = identifier in _registrations && identifier in _clients
 
     private fun identifyKey(identifier: String) = "$IDENTIFIER_KEY:$identifier"
 

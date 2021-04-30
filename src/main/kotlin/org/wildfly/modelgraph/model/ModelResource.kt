@@ -25,15 +25,14 @@ interface ModelResource {
         when {
             client != null -> {
                 if (log.isDebugEnabled) {
-                    log.debug("Call $endpoint$path/$identifier")
+                    log.debug("Call $endpoint$path for $identifier")
                 }
                 client.get("$endpoint$path").apply {
                     prepareRequest(this)
-                }.send().invoke { response ->
+                }.timeout(2000).send().map { response ->
                     if (log.isDebugEnabled) {
-                        log.debug("$endpoint$path/$identifier - ${response.statusCode()}")
+                        log.debug("$endpoint$path for $identifier returned ${response.statusCode()}")
                     }
-                }.map { response ->
                     Response.status(response.statusCode()).entity(response.bodyAsString()).build()
                 }
             }
