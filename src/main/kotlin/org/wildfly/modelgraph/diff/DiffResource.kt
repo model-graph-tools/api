@@ -12,7 +12,6 @@ import javax.ws.rs.QueryParam
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 import javax.ws.rs.core.Response.Status.BAD_REQUEST
-import javax.ws.rs.core.Response.Status.Family
 import javax.ws.rs.core.Response.Status.Family.SUCCESSFUL
 import javax.ws.rs.core.Response.Status.Family.familyOf
 
