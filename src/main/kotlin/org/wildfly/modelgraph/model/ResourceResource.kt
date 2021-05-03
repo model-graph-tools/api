@@ -8,6 +8,8 @@ import javax.ws.rs.Path
 import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
+import javax.ws.rs.core.Context
+import javax.ws.rs.core.HttpHeaders
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 
@@ -40,8 +42,12 @@ class ResourceResource(override val registry: Registry) : ModelResource {
     fun resource(
         @PathParam("identifier") identifier: String,
         @QueryParam("address") address: String,
-        @QueryParam("skip") @DefaultValue("") skip: String = ""
+        @QueryParam("skip") @DefaultValue("") skip: String = "",
+        @Context headers: HttpHeaders
     ): Uni<Response> = forward("/resource", identifier) {
+        if (headers.getRequestHeader("mgt-diff").isNotEmpty()) {
+            putHeader("mgt-diff", "true")
+        }
         addQueryParam("address", address).apply {
             if (skip.isNotEmpty()) {
                 addQueryParam("skip", skip)
