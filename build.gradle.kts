@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.31"
-    id("io.quarkus") version "1.13.1.Final"
-    id("org.jetbrains.kotlin.plugin.allopen") version "1.4.31"
+    kotlin("jvm")
+    id("io.quarkus")
+    id("org.jetbrains.kotlin.plugin.allopen")
 }
 
 repositories {
@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation(enforcedPlatform("io.quarkus:quarkus-universe-bom:1.13.1.Final"))
+    implementation(enforcedPlatform("io.quarkus:quarkus-universe-bom:_"))
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-kotlin")
     implementation("io.quarkus:quarkus-resteasy")
@@ -22,10 +22,10 @@ dependencies {
     implementation("io.quarkus:quarkus-scheduler")
     implementation("io.quarkus:quarkus-smallrye-health")
     implementation("io.quarkus:quarkus-vertx")
-    implementation("io.smallrye.reactive:mutiny-kotlin:0.15.0")
-    implementation("io.smallrye.reactive:smallrye-mutiny-vertx-web-client:2.3.0")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.3")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.31")
+    implementation("io.smallrye.reactive:mutiny-kotlin:_")
+    implementation("io.smallrye.reactive:smallrye-mutiny-vertx-web-client:_")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:_")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:_")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:kotlin-extensions")
 }
