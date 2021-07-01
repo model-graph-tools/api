@@ -1,6 +1,5 @@
 package org.wildfly.modelgraph.model
 
-import io.smallrye.mutiny.Uni
 import org.wildfly.modelgraph.registry.Registry
 import javax.ws.rs.DefaultValue
 import javax.ws.rs.GET
@@ -15,36 +14,39 @@ import javax.ws.rs.core.Response
 
 @Path("/resources")
 @Produces(MediaType.APPLICATION_JSON)
-class ResourceResource(override val registry: Registry) : ModelResource {
+class ResourceResource(
+    override val registry: Registry,
+    override val config: Config
+) : ModelResource {
 
     override val endpoint: String = "/resources"
 
     @GET
     @Path("/query/{identifier}")
-    fun query(
+    suspend fun query(
         @PathParam("identifier") identifier: String,
         @QueryParam("name") name: String
-    ): Uni<Response> = forward("/query", identifier) {
+    ): Response = forward("/query", identifier) {
         addQueryParam("name", name)
     }
 
     @GET
     @Path("/deprecated/{identifier}")
-    fun deprecated(
+    suspend fun deprecated(
         @PathParam("identifier") identifier: String,
         @QueryParam("since") @DefaultValue("") since: String = ""
-    ): Uni<Response> = forward("/deprecated", identifier) {
+    ): Response = forward("/deprecated", identifier) {
         addQueryParam("since", since)
     }
 
     @GET
     @Path("/resource/{identifier}")
-    fun resource(
+    suspend fun resource(
         @PathParam("identifier") identifier: String,
         @QueryParam("address") address: String,
         @QueryParam("skip") @DefaultValue("") skip: String = "",
         @Context headers: HttpHeaders
-    ): Uni<Response> = forward("/resource", identifier) {
+    ): Response = forward("/resource", identifier) {
         if (headers.getRequestHeader("mgt-diff").isNotEmpty()) {
             putHeader("mgt-diff", "true")
         }
@@ -57,19 +59,19 @@ class ResourceResource(override val registry: Registry) : ModelResource {
 
     @GET
     @Path("/subtree/{identifier}")
-    fun subtree(
+    suspend fun subtree(
         @PathParam("identifier") identifier: String,
         @QueryParam("address") address: String
-    ): Uni<Response> = forward("/subtree", identifier) {
+    ): Response = forward("/subtree", identifier) {
         addQueryParam("address", address)
     }
 
     @GET
     @Path("/children/{identifier}")
-    fun children(
+    suspend fun children(
         @PathParam("identifier") identifier: String,
         @QueryParam("address") address: String
-    ): Uni<Response> = forward("/children", identifier) {
+    ): Response = forward("/children", identifier) {
         addQueryParam("address", address)
     }
 }

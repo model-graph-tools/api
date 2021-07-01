@@ -1,6 +1,5 @@
 package org.wildfly.modelgraph.model
 
-import io.smallrye.mutiny.Uni
 import org.wildfly.modelgraph.registry.Registry
 import javax.ws.rs.DefaultValue
 import javax.ws.rs.GET
@@ -13,25 +12,28 @@ import javax.ws.rs.core.Response
 
 @Path("/management-model")
 @Produces(MediaType.APPLICATION_JSON)
-class ManagementModelResource(override val registry: Registry) : ModelResource {
+class ManagementModelResource(
+    override val registry: Registry,
+    override val config: Config
+) : ModelResource {
 
     override val endpoint: String = "/management-model"
 
     @GET
     @Path("/query/{identifier}")
-    fun query(
+    suspend fun query(
         @PathParam("identifier") identifier: String,
         @QueryParam("name") name: String
-    ): Uni<Response> = forward("/query", identifier) {
+    ): Response = forward("/query", identifier) {
         addQueryParam("name", name)
     }
 
     @GET
     @Path("/deprecated/{identifier}")
-    fun deprecated(
+    suspend fun deprecated(
         @PathParam("identifier") identifier: String,
         @QueryParam("since") @DefaultValue("") since: String = ""
-    ): Uni<Response> = forward("/deprecated", identifier) {
+    ): Response = forward("/deprecated", identifier) {
         addQueryParam("since", since)
     }
 }

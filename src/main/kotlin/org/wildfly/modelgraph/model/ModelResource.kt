@@ -1,6 +1,6 @@
 package org.wildfly.modelgraph.model
 
-import io.smallrye.mutiny.Uni
+import io.smallrye.mutiny.coroutines.awaitSuspending
 import io.vertx.mutiny.core.buffer.Buffer
 import io.vertx.mutiny.ext.web.client.HttpRequest
 import org.jboss.logging.Logger
@@ -15,12 +15,13 @@ interface ModelResource {
 
     val endpoint: String
     val registry: Registry
+    val config: Config
 
-    fun forward(
+    suspend fun forward(
         path: String,
         identifier: String,
         prepareRequest: HttpRequest<Buffer>.() -> HttpRequest<Buffer> = { this }
-    ): Uni<Response> = try {
+    ): Response = try {
         val client = registry.clients[identifier]
         when {
             client != null -> {
@@ -29,24 +30,19 @@ interface ModelResource {
                 }
                 client.get("$endpoint$path").apply {
                     prepareRequest(this)
-                }.timeout(2000).send().map { response ->
+                }.timeout(config.timeout()).send().map { response ->
                     if (log.isDebugEnabled) {
                         log.debug("$endpoint$path for $identifier returned ${response.statusCode()}")
                     }
                     Response.status(response.statusCode()).entity(response.bodyAsString()).build()
-                }
+                }.awaitSuspending()
             }
-            else -> Uni.createFrom().item(
-                Response.status(
-                    NOT_FOUND.statusCode,
-                    "No model service for $identifier available."
-                ).build()
-            )
+            else -> Response.status(
+                NOT_FOUND.statusCode, "No model service for $identifier available."
+            ).build()
         }
     } catch (throwable: Throwable) {
-        Uni.createFrom().item {
-            Response.status(BAD_REQUEST.statusCode, throwable.message).build()
-        }
+        Response.status(BAD_REQUEST.statusCode, throwable.message).build()
     }
 
     companion object {

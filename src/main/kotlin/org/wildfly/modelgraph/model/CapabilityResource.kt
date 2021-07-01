@@ -1,6 +1,5 @@
 package org.wildfly.modelgraph.model
 
-import io.smallrye.mutiny.Uni
 import org.wildfly.modelgraph.registry.Registry
 import javax.ws.rs.GET
 import javax.ws.rs.Path
@@ -12,16 +11,19 @@ import javax.ws.rs.core.Response
 
 @Path("/capabilities")
 @Produces(MediaType.APPLICATION_JSON)
-class CapabilityResource(override val registry: Registry) : ModelResource {
+class CapabilityResource(
+    override val registry: Registry,
+    override val config: Config
+) : ModelResource {
 
     override val endpoint: String = "/capabilities"
 
     @GET
     @Path("/query/{identifier}")
-    fun query(
+    suspend fun query(
         @PathParam("identifier") identifier: String,
         @QueryParam("name") name: String
-    ): Uni<Response> = forward("/query", identifier) {
+    ): Response = forward("/query", identifier) {
         addQueryParam("name", name)
     }
 }
