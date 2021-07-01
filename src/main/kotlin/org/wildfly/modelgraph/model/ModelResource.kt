@@ -23,23 +23,20 @@ interface ModelResource {
         prepareRequest: HttpRequest<Buffer>.() -> HttpRequest<Buffer> = { this }
     ): Response = try {
         val client = registry.clients[identifier]
-        when {
-            client != null -> {
-                if (log.isDebugEnabled) {
-                    log.debug("Call $endpoint$path for $identifier")
-                }
-                client.get("$endpoint$path").apply {
-                    prepareRequest(this)
-                }.timeout(config.timeout()).send().map { response ->
-                    if (log.isDebugEnabled) {
-                        log.debug("$endpoint$path for $identifier returned ${response.statusCode()}")
-                    }
-                    Response.status(response.statusCode()).entity(response.bodyAsString()).build()
-                }.awaitSuspending()
+        if (client != null) {
+            if (log.isDebugEnabled) {
+                log.debug("Call $endpoint$path for $identifier")
             }
-            else -> Response.status(
-                NOT_FOUND.statusCode, "No model service for $identifier available."
-            ).build()
+            client.get("$endpoint$path").apply {
+                prepareRequest(this)
+            }.timeout(config.timeout()).send().map { response ->
+                if (log.isDebugEnabled) {
+                    log.debug("$endpoint$path for $identifier returned ${response.statusCode()}")
+                }
+                Response.status(response.statusCode()).entity(response.bodyAsString()).build()
+            }.awaitSuspending()
+        } else {
+            Response.status(NOT_FOUND.statusCode, "No model service for $identifier available.").build()
         }
     } catch (throwable: Throwable) {
         Response.status(BAD_REQUEST.statusCode, throwable.message).build()
