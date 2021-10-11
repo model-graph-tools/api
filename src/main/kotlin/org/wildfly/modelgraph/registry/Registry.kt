@@ -14,19 +14,19 @@ import javax.enterprise.event.Observes
 
 data class Registration(
     @field:JsonProperty("identifier")
-    val identifier: String = "",
+    val identifier: String? = null,
     @field:JsonProperty("productName")
-    val productName: String = "",
+    val productName: String? = null,
     @field:JsonProperty("productVersion")
-    val productVersion: String = "",
+    val productVersion: String? = null,
     @field:JsonProperty("managementVersion")
-    val managementVersion: String = "",
+    val managementVersion: String? = null,
     @field:JsonProperty("modelServiceUri")
-    val modelServiceUri: String = "",
+    val modelServiceUri: String? = null,
     @field:JsonProperty("neo4jBrowserUri")
-    val neo4jBrowserUri: String = "",
+    val neo4jBrowserUri: String? = null,
     @field:JsonProperty("neo4jBoltUri")
-    val neo4jBoltUri: String = ""
+    val neo4jBoltUri: String? = null
 ) {
 
     internal fun serialize(): String =
@@ -88,23 +88,25 @@ class Registry(private val vertx: Vertx, private val redis: ReactiveRedisClient)
 
     fun register(registration: Registration) {
         log.debug("register($registration)")
-        try {
-            _registrations[registration.identifier] = registration
-            val uri = URI(registration.modelServiceUri)
-            val options = WebClientOptions().apply {
-                defaultHost = uri.host
-                defaultPort = uri.port
-                userAgent = "mgt-api"
+        if (registration.identifier != null && registration.modelServiceUri != null) {
+            try {
+                _registrations[registration.identifier] = registration
+                val uri = URI(registration.modelServiceUri)
+                val options = WebClientOptions().apply {
+                    defaultHost = uri.host
+                    defaultPort = uri.port
+                    userAgent = "mgt-api"
+                }
+                log.debug("Create web client for $registration")
+                _clients[registration.identifier] = WebClient.create(vertx, options)
+                log.debug("Web client successfully created")
+                log.debug("Execute SET ${identifyKey(registration.identifier)} ${registration.serialize()}")
+                redis.set(listOf(identifyKey(registration.identifier), registration.serialize())).subscribe().with {
+                    log.info("Registered $registration")
+                }
+            } catch (e: Exception) {
+                log.error("Unable to register $registration: ${e.message}")
             }
-            log.debug("Create web client for $registration")
-            _clients[registration.identifier] = WebClient.create(vertx, options)
-            log.debug("Web client successfully created")
-            log.debug("Execute SET ${identifyKey(registration.identifier)} ${registration.serialize()}")
-            redis.set(listOf(identifyKey(registration.identifier), registration.serialize())).subscribe().with {
-                log.info("Registered $registration")
-            }
-        } catch (e: Exception) {
-            log.error("Unable to register $registration: ${e.message}")
         }
     }
 
