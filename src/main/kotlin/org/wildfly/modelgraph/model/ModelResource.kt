@@ -10,7 +10,7 @@ import javax.ws.rs.core.Response.Status.BAD_REQUEST
 import javax.ws.rs.core.Response.Status.NOT_FOUND
 
 // Keep this as an interface, not an abstract class!
-// Otherwise CDI will grumble about constructor injection in implementations.
+// Otherwise, CDI will grumble about constructor injection in implementations.
 interface ModelResource {
 
     val endpoint: String

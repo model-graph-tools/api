@@ -3,6 +3,7 @@ package org.wildfly.modelgraph.registry
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.quarkus.redis.client.reactive.ReactiveRedisClient
 import io.quarkus.runtime.StartupEvent
+import io.quarkus.runtime.annotations.RegisterForReflection
 import io.smallrye.mutiny.Multi
 import io.vertx.ext.web.client.WebClientOptions
 import io.vertx.mutiny.core.Vertx
@@ -12,21 +13,22 @@ import java.net.URI
 import javax.enterprise.context.ApplicationScoped
 import javax.enterprise.event.Observes
 
+@RegisterForReflection
 data class Registration(
     @field:JsonProperty("identifier")
-    val identifier: String? = null,
+    val identifier: String = "",
     @field:JsonProperty("productName")
-    val productName: String? = null,
+    val productName: String = "",
     @field:JsonProperty("productVersion")
-    val productVersion: String? = null,
+    val productVersion: String = "",
     @field:JsonProperty("managementVersion")
-    val managementVersion: String? = null,
+    val managementVersion: String = "",
     @field:JsonProperty("modelServiceUri")
-    val modelServiceUri: String? = null,
+    val modelServiceUri: String = "",
     @field:JsonProperty("neo4jBrowserUri")
-    val neo4jBrowserUri: String? = null,
+    val neo4jBrowserUri: String = "",
     @field:JsonProperty("neo4jBoltUri")
-    val neo4jBoltUri: String? = null
+    val neo4jBoltUri: String = ""
 ) {
 
     internal fun serialize(): String =
@@ -88,25 +90,23 @@ class Registry(private val vertx: Vertx, private val redis: ReactiveRedisClient)
 
     fun register(registration: Registration) {
         log.debug("register($registration)")
-        if (registration.identifier != null && registration.modelServiceUri != null) {
-            try {
-                _registrations[registration.identifier] = registration
-                val uri = URI(registration.modelServiceUri)
-                val options = WebClientOptions().apply {
-                    defaultHost = uri.host
-                    defaultPort = uri.port
-                    userAgent = "mgt-api"
-                }
-                log.debug("Create web client for $registration")
-                _clients[registration.identifier] = WebClient.create(vertx, options)
-                log.debug("Web client successfully created")
-                log.debug("Execute SET ${identifyKey(registration.identifier)} ${registration.serialize()}")
-                redis.set(listOf(identifyKey(registration.identifier), registration.serialize())).subscribe().with {
-                    log.info("Registered $registration")
-                }
-            } catch (e: Exception) {
-                log.error("Unable to register $registration: ${e.message}")
+        try {
+            _registrations[registration.identifier] = registration
+            val uri = URI(registration.modelServiceUri)
+            val options = WebClientOptions().apply {
+                defaultHost = uri.host
+                defaultPort = uri.port
+                userAgent = "mgt-api"
             }
+            log.debug("Create web client for $registration")
+            _clients[registration.identifier] = WebClient.create(vertx, options)
+            log.debug("Web client successfully created")
+            log.debug("Execute SET ${identifyKey(registration.identifier)} ${registration.serialize()}")
+            redis.set(listOf(identifyKey(registration.identifier), registration.serialize())).subscribe().with {
+                log.info("Registered $registration")
+            }
+        } catch (e: Exception) {
+            log.error("Unable to register $registration: ${e.message}")
         }
     }
 
