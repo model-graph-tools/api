@@ -1,0 +1,20 @@
+[versions]
+jackson = "2.13.0"
+jsonPatch = "1.13"
+kotlin = "1.6.0-RC2"
+mutiny = "1.0.0"
+quarkus = "2.4.1.Final"
+vertx = "2.13.0"
+
+[libraries]
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+quarkus-universe = { module = "io.quarkus:quarkus-universe-bom", version.ref = "quarkus" }
+mutiny-kotlin = { module = "io.smallrye.reactive:mutiny-kotlin", version.ref = "mutiny" }
+vertx-web-client = { module = "io.smallrye.reactive:smallrye-mutiny-vertx-web-client", version.ref = "vertx" }
+json-patch = { module = "com.github.java-json-tools:json-patch", version.ref = "jsonPatch" }
+jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+
+[plugins]
+jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
+quarkus = { id =  "io.quarkus", version.ref = "quarkus"}
