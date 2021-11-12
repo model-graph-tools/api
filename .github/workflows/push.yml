@@ -20,17 +20,16 @@ jobs:
       - name: Grant Gradle Build
         run: chmod +x gradlew
       - name: Run Gradle Build
-        id: gradle_build
         run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
       - name: Get Version
-        id: get_version
+        id: get-version
         uses: battila7/get-version-action@v2.2.1
       - name: Build Image
         id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
           image: modelgraphtools/api
-          tags: ${{ steps.get_version.outputs.version-without-v }}
+          tags: ${{ steps.get-version.outputs.version-without-v }}
           containerfiles: |
             ./src/main/docker/Dockerfile.native-distroless
       - name: Log in to Quay.io
