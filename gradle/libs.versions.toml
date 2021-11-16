@@ -1,10 +1,10 @@
 [versions]
 jackson = "2.13.0"
 jsonPatch = "1.13"
-kotlin = "1.6.0-RC2"
-mutiny = "1.0.0"
-quarkus = "2.4.1.Final"
-vertx = "2.13.0"
+kotlin = "1.6.0"
+mutiny = "1.1.2"
+quarkus = "2.4.2.Final"
+vertx = "2.15.1"
 
 [libraries]
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
